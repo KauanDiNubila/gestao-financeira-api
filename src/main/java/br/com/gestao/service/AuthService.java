@@ -5,6 +5,7 @@ import br.com.gestao.domain.usuario.Usuario;
 import br.com.gestao.domain.usuario.UsuarioRepository;
 import br.com.gestao.dto.CadastroRequest;
 import br.com.gestao.dto.LoginRequest;
+import br.com.gestao.exception.RegraDeNegocioException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
@@ -24,7 +25,7 @@ public class AuthService {
     public void cadastrar(CadastroRequest request) {
 
         if (usuarioRepository.existsByEmail(request.email())) {
-            throw new RuntimeException("Email já cadastrado");
+            throw new RegraDeNegocioException("Email já cadastrado");
         }
 
         Usuario usuario = Usuario.builder()

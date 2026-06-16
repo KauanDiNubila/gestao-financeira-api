@@ -12,6 +12,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 
 import java.util.List;
 
@@ -31,10 +33,8 @@ public class TransacaoController {
     }
 
     @GetMapping
-    public ResponseEntity<List<TransacaoResponse>> listar(Authentication authentication) {
-
-        List<TransacaoResponse> transacoes = transacaoService.listar(authentication.getName());
-        return ResponseEntity.ok(transacoes);
+    public ResponseEntity<Page<TransacaoResponse>> listar(Authentication authentication, Pageable pageable) {
+        return ResponseEntity.ok(transacaoService.listar(authentication.getName(), pageable));
     }
 
     @GetMapping("/{id}")

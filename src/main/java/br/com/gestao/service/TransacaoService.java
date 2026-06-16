@@ -9,9 +9,14 @@ import br.com.gestao.dto.CategoriaSumarizadaResponse;
 import br.com.gestao.dto.ResumoMensalResponse;
 import br.com.gestao.dto.TransacaoRequest;
 import br.com.gestao.dto.TransacaoResponse;
+import br.com.gestao.exception.AcessoNegadoException;
+import br.com.gestao.exception.RecursoNaoEncontradoException;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+
 
 import java.math.BigDecimal;
 import java.time.YearMonth;
@@ -43,19 +48,16 @@ public class TransacaoService {
         return TransacaoResponse.from(transacaoRepository.save(transacao));
     }
 
-    public List<TransacaoResponse> listar(String email) {
-
+    public Page<TransacaoResponse> listar(String email, Pageable pageable) {
         Usuario usuario = buscarUsuarioPorEmail(email);
-        return transacaoRepository.findByUsuario(usuario)
-                .stream()
-                .map(TransacaoResponse::from)
-                .toList();
+        return transacaoRepository.findByUsuario(usuario, pageable)
+                .map(TransacaoResponse::from);
     }
 
     public TransacaoResponse buscarPorId(Long id, String email) {
 
         Transacao transacao = transacaoRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Transação não encontrada"));
+                .orElseThrow(() -> new RecursoNaoEncontradoException("Transação não encontrada"));
         validarDono(transacao, email);
         return TransacaoResponse.from(transacao);
     }
@@ -63,7 +65,7 @@ public class TransacaoService {
     public TransacaoResponse editar(Long id, TransacaoRequest request, String email) {
 
         Transacao transacao = transacaoRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Transação não encontrada"));
+                .orElseThrow(() -> new RecursoNaoEncontradoException("Transação não encontrada"));
         validarDono(transacao, email);
 
         transacao.setDescricao(request.descricao());
@@ -78,7 +80,7 @@ public class TransacaoService {
     public void deletar(Long id, String email) {
 
         Transacao transacao = transacaoRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Transação não encontrada"));
+                .orElseThrow(() -> new RecursoNaoEncontradoException("Transação não encontrada"));
         validarDono(transacao, email);
         transacaoRepository.delete(transacao);
     }
@@ -86,17 +88,15 @@ public class TransacaoService {
     private Usuario buscarUsuarioPorEmail(String email) {
 
         return usuarioRepository.findByEmail(email)
-                .orElseThrow(() -> new RuntimeException("Usuário não encontrado"));
+                .orElseThrow(() -> new RecursoNaoEncontradoException("Usuário não encontrado"));
     }
 
     private void validarDono(Transacao transacao, String email) {
 
         String emailDono = transacao.getUsuario().getEmail();
-        System.out.println(">>> Email do token: " + email);
-        System.out.println(">>> Email do dono: " + emailDono);
 
         if (!emailDono.equals(email)) {
-            throw new RuntimeException("Acesso negado");
+            throw new AcessoNegadoException("Acesso negado");
         }
     }
 
