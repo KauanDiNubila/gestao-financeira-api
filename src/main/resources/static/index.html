@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gestão Financeira Pessoal</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>Gestão Financeira Pessoal</h1>
+            <p class="subtitle">Controle de receitas e despesas &middot; Spring Boot API</p>
+        </header>
+
+        <!-- TELA DE LOGIN / CADASTRO -->
+        <section id="auth-section" class="card auth-card">
+            <div class="tabs">
+                <button id="tab-login" class="tab active" onclick="trocarAba('login')">Entrar</button>
+                <button id="tab-cadastro" class="tab" onclick="trocarAba('cadastro')">Cadastrar</button>
+            </div>
+
+            <!-- Login -->
+            <div id="form-login">
+                <div class="form-group">
+                    <label for="login-email">Email</label>
+                    <input type="email" id="login-email" placeholder="seu@email.com">
+                </div>
+                <div class="form-group">
+                    <label for="login-senha">Senha</label>
+                    <input type="password" id="login-senha" placeholder="••••••">
+                </div>
+                <button class="btn-primary" onclick="login()">Entrar</button>
+            </div>
+
+            <!-- Cadastro -->
+            <div id="form-cadastro" class="hidden">
+                <div class="form-group">
+                    <label for="cad-nome">Nome</label>
+                    <input type="text" id="cad-nome" placeholder="Seu nome">
+                </div>
+                <div class="form-group">
+                    <label for="cad-email">Email</label>
+                    <input type="email" id="cad-email" placeholder="seu@email.com">
+                </div>
+                <div class="form-group">
+                    <label for="cad-senha">Senha</label>
+                    <input type="password" id="cad-senha" placeholder="mínimo 6 caracteres">
+                </div>
+                <button class="btn-primary" onclick="cadastrar()">Criar conta</button>
+            </div>
+
+            <p id="auth-msg" class="msg hidden"></p>
+        </section>
+
+        <!-- PAINEL PRINCIPAL -->
+        <main id="main-panel" class="hidden">
+            <div class="user-bar">
+                <span id="user-info"></span>
+                <button class="btn-secondary" onclick="logout()">Sair</button>
+            </div>
+
+            <!-- RESUMO DO MÊS -->
+            <section class="card">
+                <div class="card-header">
+                    <h2>Resumo do mês</h2>
+                    <input type="month" id="resumo-mes" onchange="carregarResumo()">
+                </div>
+                <div class="resumo-grid">
+                    <div class="resumo-item receita">
+                        <span class="resumo-label">Receitas</span>
+                        <span class="resumo-valor" id="total-receitas">R$ 0,00</span>
+                    </div>
+                    <div class="resumo-item despesa">
+                        <span class="resumo-label">Despesas</span>
+                        <span class="resumo-valor" id="total-despesas">R$ 0,00</span>
+                    </div>
+                    <div class="resumo-item saldo">
+                        <span class="resumo-label">Saldo</span>
+                        <span class="resumo-valor" id="saldo">R$ 0,00</span>
+                    </div>
+                </div>
+            </section>
+
+            <div class="grid">
+                <!-- NOVA TRANSAÇÃO -->
+                <section class="card">
+                    <h2>Nova transação</h2>
+                    <form onsubmit="criarTransacao(event)">
+                        <div class="form-group">
+                            <label for="t-descricao">Descrição</label>
+                            <input type="text" id="t-descricao" required>
+                        </div>
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="t-valor">Valor (R$)</label>
+                                <input type="number" id="t-valor" step="0.01" min="0" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="t-tipo">Tipo</label>
+                                <select id="t-tipo" required>
+                                    <option value="RECEITA">Receita</option>
+                                    <option value="DESPESA">Despesa</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="t-categoria">Categoria</label>
+                                <input type="text" id="t-categoria" placeholder="Ex: Alimentação" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="t-data">Data</label>
+                                <input type="date" id="t-data" required>
+                            </div>
+                        </div>
+                        <button type="submit" class="btn-primary">Adicionar</button>
+                        <p id="transacao-msg" class="msg hidden"></p>
+                    </form>
+                </section>
+
+                <!-- GASTOS POR CATEGORIA -->
+                <section class="card">
+                    <div class="card-header">
+                        <h2>Despesas por categoria</h2>
+                        <button class="btn-small" onclick="carregarPorCategoria()">Atualizar</button>
+                    </div>
+                    <ul id="categoria-list" class="data-list"></ul>
+                </section>
+            </div>
+
+            <!-- LISTA DE TRANSAÇÕES -->
+            <section class="card">
+                <div class="card-header">
+                    <h2>Transações</h2>
+                    <button class="btn-small" onclick="carregarTransacoes()">Atualizar</button>
+                </div>
+                <ul id="transacoes-list" class="data-list"></ul>
+                <div class="paginacao">
+                    <button class="btn-secondary" id="btn-anterior" onclick="paginaAnterior()">Anterior</button>
+                    <span id="pagina-info">Página 1</span>
+                    <button class="btn-secondary" id="btn-proxima" onclick="proximaPagina()">Próxima</button>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <script src="config.js"></script>
+    <script src="app.js"></script>
+</body>
+</html>
